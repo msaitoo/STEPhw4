@@ -15,24 +15,26 @@ def initVertex(sample):
     vertex = []
     links = []
     for i in range(1, numberofVertex+1):
-        vertex.append({'Vertex':sample[i].rstrip("\n"), 'point': 100.0, 'out': 0, 'in': 0})
+        vertex.append({'Vertex':sample[i].rstrip("\n"), 'point': 100.0, 'link': 0, 'in': 0})
         links.append([])
     for i in range(int(numberofVertex)+2, len(sample)):
         for chouten in range(len(vertex)):
             if sample[i][0] == vertex[chouten]['Vertex']:
-                vertex[chouten]['out'] += 1
+                vertex[chouten]['link'] += 1
                 links[chouten].append(sample[i][2])
     return (vertex, links)
 
 def splitPoints(vertex, links):
     for i in range(len(vertex)):
-        vertex[i]['point'] = vertex[i]['point'] / vertex[i]['out']
-        
-        #for out in range(len(links)):
-            #for link in range(len(links[i])):
-                #if vertex[i]['Vertex'] == links[i][link]:
-                    #print links[out][link]
-                    #links[out]['in'] += vertex[i]['point']
+        vertex[i]['point'] = vertex[i]['point'] / vertex[i]['link']
+    for i in range(len(links)):
+        for x in range(len(vertex)):
+            for y in range(len(links[i])):
+                if links[i][y] == vertex[x]['Vertex']:
+                    vertex[x]['in'] += vertex[i]['point']
+    for i in range(len(vertex)):
+        vertex[i]['point'] = vertex[i]['in']
+        vertex[i]['in'] = 0
     return vertex
 
 vertex = initVertex(sample)
