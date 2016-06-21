@@ -42,5 +42,12 @@ def splitPoints(vertex, links):
     
     return (vertex, links)
 
+def repeatSplit (vertex, links):
+    "Repeats splitting points."
+    for i in range(20):
+        points = splitPoints(vertex, links)
+        vertex = points[0]
+    return vertex
+
 vertex = initVertex(sample)
-points = splitPoints(vertex[0], vertex[1])
+result = repeatSplit(vertex[0], vertex[1])
