@@ -1,59 +1,65 @@
 import sys
 
 if (len(sys.argv) != 3):
-    print "usage: python {} Filename NumberOfIteration".format(sys.argv[0])
+    print "usage: python {} Filename NumberOfSteps".format(sys.argv[0])
     sys.exit()
-data = sys.argv[1]
-iteration = sys.argv[2]
+
+data        = sys.argv[1]
+steps       = sys.argv[2]
+
 sampleinput = open (data, 'r')
-sample = sampleinput.readlines()
+sample      = sampleinput.readlines()
 
 def initVertex(sample):
-    "Create vertices with its name, points, and number of links."
+    "Create dataset of vertices with its name, points, and number of links."
     numberofVertex = int(sample[0].rstrip("\n"))
-    vertex = []
-    links = []
+    vertex = []             #Store vertex and its data
+    links  = []             #Store where it links to
     
     for i in range(1, numberofVertex+1):
+                            #dict              'name',   'points',  'number of links'
         vertex.append({'Vertex':sample[i].rstrip("\n"), 'point': 100, 'link': 0})
-        links.append([])
+        
+        links.append([])    #Index corresponds to vertex of origin of points
     
     for i in range(int(numberofVertex)+2, len(sample)):
         for chouten in range(len(vertex)):
             if sample[i][0] == vertex[chouten]['Vertex']:
-                vertex[chouten]['link'] += 1
-                links[chouten].append(sample[i][2])
+                vertex[chouten]['link'] += 1        #Count number of links
+                
+                links[chouten].append(sample[i][2]) #Add vertex name where it links to
     
     return (vertex, links)
 
 def splitPoints(vertex, links):
     "Distribute points to its linked vertices."
-    distributed = []
+    distributed = []            #Store distributed points
     
     for i in range(len(vertex)):
-        distributed.append(0)
+        distributed.append(0)   #Received points
+        #Calculate how much of its points a vertex will distribute to each link
         vertex[i]['point'] = vertex[i]['point'] / vertex[i]['link']
     
     for i in range(len(links)):
         for x in range(len(vertex)):
             for y in range(len(links[i])):
-                if links[i][y] == vertex[x]['Vertex']:
+                if links[i][y] == vertex[x]['Vertex']:      #Find linked vertex and give points
                     distributed[x] += vertex[i]['point']
     
     for i in range(len(vertex)):
-        vertex[i]['point'] = distributed[i]
-        distributed[i] = 0
+        vertex[i]['point'] = distributed[i]     #Save in dict
+        distributed[i]     = 0                  #Reset received points to 0
     
     return (vertex, links)
 
-def repeatSplit (vertex, links, iteration):
-    "Repeats splitting points."
-    for i in range(int(iteration)):
+def repeatPoints (vertex, links, steps):
+    "Repeats distribution of points for number of steps given."
+    for i in range(int(steps)):
         points = splitPoints(vertex, links)
         vertex = points[0]
     return vertex
 
 vertex = initVertex(sample)
-result = repeatSplit(vertex[0], vertex[1], iteration)
+result = repeatPoints(vertex[0], vertex[1], steps)
 
 print result
