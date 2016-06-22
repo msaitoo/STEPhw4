@@ -80,4 +80,3 @@ repeated = repeatPoints(vertex[0], vertex[1], steps)
 result   = organiseData(repeated)
 
 print result
-print "A vertex with the most points is {}".format(max(result))
