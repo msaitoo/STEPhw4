@@ -1,4 +1,4 @@
-import sys, numpy
+import sys, numpy, time
 
 if (len(sys.argv) != 3):
     print "usage: python {} Filename NumberOfSteps".format(sys.argv[0])
@@ -73,6 +73,13 @@ def Iteration(tensorMatrix, vector, steps):
     
     return vector
 
+start = time.time()
+
 initial = initTensor(sample)
 answer = Iteration(initial[0], initial[1], steps)
+
+end = time.time()
+
+time = end - start
 print answer
+print "It took {} sec.".format(time)
