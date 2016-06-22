@@ -17,7 +17,7 @@ def initVertex(sample):
     links  = []             #Store where it links to
     
     for i in range(1, numberofNodes+1):
-                            #dict              'name',   'points',  'number of links'
+                            #Give each node a 'name', 'points', and' number of links'
         node.append({'Node':sample[i].rstrip("\n"), 'point': 100.0, 'link': 0})
         
         links.append([])    #Index corresponds to a node of origin of points
@@ -25,17 +25,17 @@ def initVertex(sample):
     for i in range(int(numberofNodes)+2, len(sample)):
         for chouten in range(len(node)):
             for index in range(len(sample[i])):
-                if sample[i][index] == ' ':         #Indicate where the two nodes' names are
+                if sample[i][index] == ' ':           #Indicate where the two nodes' names are
                     space = index
                 if sample[i][index] == "\n":
                     end   = index
                 
             sourseNode = sample[i][0:space]
             if sourseNode == node[chouten]['Node']:
-                node[chouten]['link'] += 1        #Count number of links
+                node[chouten]['link'] += 1            #Count number of links
                 
                 link = sample[i][space+1: end]
-                links[chouten].append(link)         #Add vertex names where it links to
+                links[chouten].append(link)           #Add vertex names where it links to
     
     return (node, links)
 
@@ -57,8 +57,8 @@ def splitPoints(node, links):
                     distributed[x]  = round(distributed[x], 2)
     
     for i in range(len(node)):
-        node[i]['point']   = distributed[i]     #Save in dict
-        distributed[i]     = 0                  #Reset received points to 0
+        node[i]['point']   = distributed[i]      #Save in dict
+        distributed[i]     = 0                   #Reset received points to 0
     
     return (node, links)
 
@@ -66,10 +66,11 @@ def repeatPoints (node, links, steps):
     "Repeats distribution of points for number of steps given."
     for i in range(int(steps)):
         points = splitPoints(node, links)
-        node = points[0]
+        node   = points[0]
     return node
 
 def organiseData (node):
+    "Returns a list of results with a node's name and its points."
     result = []
     for i in range(len(node)):
         result.append({node[i]['Node']: node[i]['point']})
