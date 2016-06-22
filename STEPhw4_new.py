@@ -4,8 +4,8 @@ if (len(sys.argv) != 3):
     print "usage: python {} Filename NumberOfSteps".format(sys.argv[0])
     sys.exit()
 
-data        = sys.argv[1]
-steps       = sys.argv[2]
+data        = sys.argv[1]               #Filename
+steps       = sys.argv[2]               #Number of iteration
 
 sampleinput = open (data, 'r')
 sample      = sampleinput.readlines()
@@ -16,14 +16,13 @@ def initTensor(sample):
     
     initVector = numpy.zeros((numberofNodes, 1))
     for i in range(numberofNodes):
-        initVector[i] = 100
+        initVector[i] = 100                              #Give starting value
     
-    node, links, linknumber   = [], [], []
+    node, links = [], []                                 #Store node names and where it links to
     
-    for i in range(1, numberofNodes+1):
+    for i in range(1, numberofNodes+1):                  #Linked nodes
         node.append(sample[i].rstrip("\n"))
         links.append([])
-        linknumber.append(0)
     
     for i in range(int(numberofNodes)+2, len(sample)):
         for chouten in range(len(node)):
@@ -33,45 +32,47 @@ def initTensor(sample):
                 if sample[i][index] == "\n":
                     end   = index
                 
-            sourseNode = sample[i][0:space]
+            sourseNode = sample[i][0:space]              #Indicate where node name is
             if sourseNode == node[chouten]:
-                linknumber[chouten] += 1
+                linkedNode = sample[i][space+1: end]     #Indicate where it links to
                 
-                linkedNode = sample[i][space+1: end]
                 for x in range(len(node)):
-                    if linkedNode == node[x]:
+                    if linkedNode == node[x]:            #Store index of linked nodes
                         links[chouten].append(x)
     
-    tensor = numpy.zeros((numberofNodes, numberofNodes))
+    tensor = numpy.zeros((numberofNodes, numberofNodes)) #Create translation matrix
     for j in range(numberofNodes):
         for i in range(len(links[j])):
-            tensor[links[j][i]][j] = 1.0/(linknumber[j])
-    return (node, linknumber, links, tensor, initVector)   
+            tensor[links[j][i]][j] = 1.0/(len(links[j])) #Fraction of distribution
+    
+    return (tensor, initVector)
 
-def distributePoints(tensor, initVector):
-    elements = []
+def makeMatrix(tensor, initVector):
+    "Change arrays of tensor and initVector into matrices."
+    Tensorelements = []
     for i in range(len(tensor[0])):
-        elements.append((tensor[i]))
-    tensorMatrix = numpy.matrix(elements)
+        Tensorelements.append((tensor[i]))
+    tensorMatrix = numpy.matrix(Tensorelements)          #Make tensor into numpy matrix form
     
     Pointelements = []
     for i in range(len(initVector)):
         Pointelements.append((initVector[i]))
-    initVector = numpy.matrix(Pointelements)
+    vectorMatrix = numpy.matrix(Pointelements)           #Make colum array into numpy matrix form
     
-    return (tensorMatrix*initVector)
+    return (tensorMatrix * vectorMatrix)                 #Multiply two matrices
 
-def repeatProcess(tensorMatrix, vector, steps):
-    vector = distributePoints(initial[3], initial[4])
+def Iteration(tensorMatrix, vector, steps):
+    "Iterate multiplication of matrices for given number of steps"
+    vector = makeMatrix(initial[0], initial[1])          #First iteration
     
-    for i in range(int(steps)):
-        vector = tensorMatrix*vector
+    for i in range(int(steps)-1):
+        vector = tensorMatrix * vector                   #Multiply tensor to vector
     
     for i in range(len(vector)):
-        vector[i] = round(vector[i], 2)
+        vector[i] = round(vector[i], 2)                  #Round values to two decimal places
     
     return vector
 
 initial = initTensor(sample)
-answer = repeatProcess(initial[3], initial[4], steps)
+answer = Iteration(initial[0], initial[1], steps)
 print answer
