@@ -11,72 +11,72 @@ sampleinput = open (data, 'r')
 sample      = sampleinput.readlines()
 
 def initVertex(sample):
-    "Create dataset of vertices with its name, points, and number of links."
-    numberofVertex = int(sample[0].rstrip("\n"))
-    vertex = []             #Store vertex and its data
+    "Create dataset of nodes with its name, points, and number of links."
+    numberofNodes = int(sample[0].rstrip("\n"))
+    node   = []             #Store node and its data
     links  = []             #Store where it links to
     
-    for i in range(1, numberofVertex+1):
+    for i in range(1, numberofNodes+1):
                             #dict              'name',   'points',  'number of links'
-        vertex.append({'Vertex':sample[i].rstrip("\n"), 'point': 100.0, 'link': 0})
+        node.append({'Node':sample[i].rstrip("\n"), 'point': 100.0, 'link': 0})
         
-        links.append([])    #Index corresponds to vertex of origin of points
+        links.append([])    #Index corresponds to a node of origin of points
     
-    for i in range(int(numberofVertex)+2, len(sample)):
-        for chouten in range(len(vertex)):
+    for i in range(int(numberofNodes)+2, len(sample)):
+        for chouten in range(len(node)):
             for index in range(len(sample[i])):
-                if sample[i][index] == ' ':         #Indicate where the two vertices names are
+                if sample[i][index] == ' ':         #Indicate where the two nodes' names are
                     space = index
                 if sample[i][index] == "\n":
                     end   = index
                 
-            sourseVertex = sample[i][0:space]
-            if sourseVertex == vertex[chouten]['Vertex']:
-                vertex[chouten]['link'] += 1        #Count number of links
+            sourseNode = sample[i][0:space]
+            if sourseNode == node[chouten]['Node']:
+                node[chouten]['link'] += 1        #Count number of links
                 
                 link = sample[i][space+1: end]
                 links[chouten].append(link)         #Add vertex names where it links to
     
-    return (vertex, links)
+    return (node, links)
 
-def splitPoints(vertex, links):
+def splitPoints(node, links):
     "Distribute points to its linked vertices."
     distributed = []                            #Store distributed points
     
-    for i in range(len(vertex)):
+    for i in range(len(node)):
         distributed.append(0)                   #Received points
         #Calculate how much of its points a vertex will distribute to each link
-        if vertex[i]['link'] != 0:
-            vertex[i]['point'] = vertex[i]['point'] / vertex[i]['link']
+        if node[i]['link']  != 0:
+            node[i]['point'] = node[i]['point'] / node[i]['link']
     
     for i in range(len(links)):
-        for x in range(len(vertex)):
+        for x in range(len(node)):
             for y in range(len(links[i])):
-                if links[i][y] == vertex[x]['Vertex']:      #Find linked vertex and give points
-                    distributed[x] += vertex[i]['point']
+                if links[i][y] == node[x]['Node']:      #Find linked nodes and give points
+                    distributed[x] += node[i]['point']
                     distributed[x]  = round(distributed[x], 2)
     
-    for i in range(len(vertex)):
-        vertex[i]['point'] = distributed[i]     #Save in dict
+    for i in range(len(node)):
+        node[i]['point']   = distributed[i]     #Save in dict
         distributed[i]     = 0                  #Reset received points to 0
     
-    return (vertex, links)
+    return (node, links)
 
-def repeatPoints (vertex, links, steps):
+def repeatPoints (node, links, steps):
     "Repeats distribution of points for number of steps given."
     for i in range(int(steps)):
-        points = splitPoints(vertex, links)
-        vertex = points[0]
-    return vertex
+        points = splitPoints(node, links)
+        node = points[0]
+    return node
 
-def organiseData (vertex):
+def organiseData (node):
     result = []
-    for i in range(len(vertex)):
-        result.append({vertex[i]['Vertex']: vertex[i]['point']})
+    for i in range(len(node)):
+        result.append({node[i]['Node']: node[i]['point']})
     return result
 
-vertex   = initVertex(sample)
-repeated = repeatPoints(vertex[0], vertex[1], steps)
+node     = initVertex(sample)
+repeated = repeatPoints(node[0], node[1], steps)
 result   = organiseData(repeated)
 
 print result
