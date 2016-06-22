@@ -10,7 +10,7 @@ steps       = sys.argv[2]
 sampleinput = open (data, 'r')
 sample      = sampleinput.readlines()
 
-def initVertex(sample):
+def initNode(sample):
     "Create dataset of nodes with its name, points, and number of links."
     numberofNodes = int(sample[0].rstrip("\n"))
     node   = []             #Store node and its data
@@ -76,7 +76,7 @@ def organiseData (node):
         result.append({node[i]['Node']: node[i]['point']})
     return result
 
-node     = initVertex(sample)
+node     = initNode(sample)
 repeated = repeatPoints(node[0], node[1], steps)
 result   = organiseData(repeated)
 
