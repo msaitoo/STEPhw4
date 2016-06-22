@@ -18,33 +18,43 @@ def initVertex(sample):
     
     for i in range(1, numberofVertex+1):
                             #dict              'name',   'points',  'number of links'
-        vertex.append({'Vertex':sample[i].rstrip("\n"), 'point': 100, 'link': 0})
+        vertex.append({'Vertex':sample[i].rstrip("\n"), 'point': 100.0, 'link': 0})
         
         links.append([])    #Index corresponds to vertex of origin of points
     
     for i in range(int(numberofVertex)+2, len(sample)):
         for chouten in range(len(vertex)):
-            if sample[i][0] == vertex[chouten]['Vertex']:
+            for index in range(len(sample[i])):
+                if sample[i][index] == ' ':         #Indicate where the two vertices names are
+                    space = index
+                if sample[i][index] == "\n":
+                    end   = index
+                
+            sourseVertex = sample[i][0:space]
+            if sourseVertex == vertex[chouten]['Vertex']:
                 vertex[chouten]['link'] += 1        #Count number of links
                 
-                links[chouten].append(sample[i][2]) #Add vertex name where it links to
+                link = sample[i][space+1: end]
+                links[chouten].append(link)         #Add vertex names where it links to
     
     return (vertex, links)
 
 def splitPoints(vertex, links):
     "Distribute points to its linked vertices."
-    distributed = []            #Store distributed points
+    distributed = []                            #Store distributed points
     
     for i in range(len(vertex)):
-        distributed.append(0)   #Received points
+        distributed.append(0)                   #Received points
         #Calculate how much of its points a vertex will distribute to each link
-        vertex[i]['point'] = vertex[i]['point'] / vertex[i]['link']
+        if vertex[i]['link'] != 0:
+            vertex[i]['point'] = vertex[i]['point'] / vertex[i]['link']
     
     for i in range(len(links)):
         for x in range(len(vertex)):
             for y in range(len(links[i])):
                 if links[i][y] == vertex[x]['Vertex']:      #Find linked vertex and give points
                     distributed[x] += vertex[i]['point']
+                    distributed[x]  = round(distributed[x], 2)
     
     for i in range(len(vertex)):
         vertex[i]['point'] = distributed[i]     #Save in dict
