@@ -69,7 +69,15 @@ def repeatPoints (vertex, links, steps):
         vertex = points[0]
     return vertex
 
-vertex = initVertex(sample)
-result = repeatPoints(vertex[0], vertex[1], steps)
+def organiseData (vertex):
+    result = []
+    for i in range(len(vertex)):
+        result.append({vertex[i]['Vertex']: vertex[i]['point']})
+    return result
+
+vertex   = initVertex(sample)
+repeated = repeatPoints(vertex[0], vertex[1], steps)
+result   = organiseData(repeated)
 
 print result
+print "A vertex with the most points is {}".format(max(result))
