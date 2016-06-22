@@ -45,6 +45,14 @@ def initTensor(sample):
         for i in range(len(links[j])):
             tensor[links[j][i]][j] = 1.0/(len(links[j])) #Fraction of distribution
     
+    for i in range(numberofNodes):                       #Takes in account for dangling node
+        column = 0
+        for j in range(numberofNodes):
+            column += tensor[i][j]
+        if column == 0:
+            for j in range(numberofNodes):
+                tensor[i][j] = 1.0                       #Fill in the elements with 1.0
+    
     return (tensor, initVector)
 
 def makeMatrix(tensor, initVector):
@@ -66,20 +74,41 @@ def Iteration(tensorMatrix, vector, steps):
     vector = makeMatrix(initial[0], initial[1])          #First iteration
     
     for i in range(int(steps)-1):
-        vector = tensorMatrix * vector                   #Multiply tensor to vector
+        prevector = vector
+        vector    = tensorMatrix * vector                #Multiply tensor to vector
     
     for i in range(len(vector)):
         vector[i] = round(vector[i], 2)                  #Round values to two decimal places
     
-    return vector
+    return (vector, prevector)
 
-start = time.time()
+def Check (vector, prevector):
+    "Checks if the system has converged or not."
+    difference = vector - prevector                      #Difference between vector and the previous one
+    SUM = []
+    for i in range(len(difference)):
+        element = abs(int(difference[i]))
+        SUM.append(element)
+    SUM = sum(SUM)                                       #Sum of elements of difference
+    
+    if abs(SUM) <= 0.5:                                  #Condition for convergence
+        print 'The result is or is close to converged final result.'
+    else:
+        print '''
+        The number of iteration might not be enough, please try again with bigger number of steps.
+        If this keeps popping up, then the result might be diverging.
+        '''
+    return SUM
+
+start   = time.time()                                    #Start timer
 
 initial = initTensor(sample)
-answer = Iteration(initial[0], initial[1], steps)
+answer  = Iteration(initial[0], initial[1], steps)
 
-end = time.time()
+end     = time.time()                                    #End timer
 
 time = end - start
-print answer
+print answer[0]                                          #Final vector
 print "It took {} sec.".format(time)
+
+check = Check(answer[0], answer[1])
